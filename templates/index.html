@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedLink | Advanced Healthcare & Hospital Finder</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Outfit & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet.js Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        :root {
+            --medical-blue: #0ea5e9;
+            --medical-green: #22c55e;
+            --medical-dark: #0f172a;
+            --medical-light: #f8fafc;
+            --emergency-red: #ef4444;
+        }
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#main-nav" data-bs-offset="100">
+
+    <!-- Emergency Floating Button -->
+    <div class="emergency-fab" data-bs-toggle="modal" data-bs-target="#emergencyModal">
+        <i class="fa-solid fa-phone-flip"></i>
+        <span>EMERGENCY</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white border-bottom shadow-sm" id="main-nav">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <div class="logo-icon bg-blue-grad text-white me-2">
+                    <i class="fa-solid fa-staff-snake"></i>
+                </div>
+                <span class="fw-bold text-dark fs-4">MedLink</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fa-solid fa-bars-staggered"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 fw-semibold">
+                    <li class="nav-item"><a class="nav-link px-3" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#finder">Hospital Finder</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#first-aid">First Aid</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#tools">Health Tools</a></li>
+                    <li class="nav-item"><a class="nav-link px-3" href="#about">About</a></li>
+                </ul>
+                <div class="ms-lg-3 d-flex gap-2 align-items-center" id="auth-buttons">
+                    <button class="btn btn-outline-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+                    <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#signupModal">Sign Up</button>
+                </div>
+                <div class="ms-lg-3 d-none gap-2 align-items-center" id="user-profile">
+                    <span class="fw-bold me-2" id="username-display"></span>
+                    <button class="btn btn-sm btn-outline-danger rounded-circle" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="home" class="hero-section d-flex align-items-center py-5">
+        <div class="container text-center text-lg-start">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <span class="badge rounded-pill bg-light-green text-green mb-3 px-3 py-2 fw-bold">
+                        <i class="fa-solid fa-shield-heart me-2"></i> Trusted by 10k+ Families
+                    </span>
+                    <h1 class="display-3 fw-bold mb-4">Your Health, <span class="text-blue">Our Priority</span>.</h1>
+                    <p class="lead text-muted mb-5 fs-5">Find nearby hospitals instantly, access life-saving first aid instructions, and monitor your well-being with our smart healthcare assistant.</p>
+                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
+                        <a href="#finder" class="btn btn-primary btn-lg rounded-pill px-5 py-3 shadow">
+                            <i class="fa-solid fa-location-dot me-2"></i> Find Hospital Now
+                        </a>
+                        <a href="#emergency" class="btn btn-outline-danger btn-lg rounded-pill px-4 py-3 border-2" data-bs-toggle="modal" data-bs-target="#emergencyModal">
+                            <i class="fa-solid fa-truck-medical me-2"></i> Emergency Support
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 mt-5 mt-lg-0 hero-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80" alt="Healthcare" class="img-fluid rounded-4 shadow-lg hero-img">
+                    <div class="floating-card rounded-4 p-3 shadow text-center bg-white">
+                        <h4 class="fw-bold text-blue mb-0">24/7</h4>
+                        <small class="text-muted fw-bold">Emergency Support</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Service Cards -->
+    <section class="services-section py-5 bg-medical-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Smart Healthcare Features</h2>
+                <div class="section-underline mx-auto"></div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 service-card p-4 transition">
+                        <div class="service-icon bg-soft-blue text-blue mb-3">
+                            <i class="fa-solid fa-magnifying-glass-plus"></i>
+                        </div>
+                        <h5 class="fw-bold">Hospital Finder</h5>
+                        <p class="text-muted small">Locate real-time beds and ICU availability in hospitals near you.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 service-card p-4 transition">
+                        <div class="service-icon bg-soft-red text-danger mb-3">
+                            <i class="fa-solid fa-kit-medical"></i>
+                        </div>
+                        <h5 class="fw-bold">Emergency Help</h5>
+                        <p class="text-muted small">One-tap access to emergency services and immediate medical guidance.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 service-card p-4 transition">
+                        <div class="service-icon bg-soft-green text-green mb-3">
+                            <i class="fa-solid fa-book-medical"></i>
+                        </div>
+                        <h5 class="fw-bold">First Aid Guide</h5>
+                        <p class="text-muted small">Step-by-step instructions for accidental burn, cuts, and CPR.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 service-card p-4 transition">
+                        <div class="service-icon bg-soft-yellow text-warning mb-3">
+                            <i class="fa-solid fa-face-smile-wink"></i>
+                        </div>
+                        <h5 class="fw-bold">Emotion Tracker</h5>
+                        <p class="text-muted small">Check your current emotional state using our AI-driven detector.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hospital Finder Section -->
+    <section id="finder" class="finder-section py-5">
+        <div class="container">
+            <div class="row mb-5 align-items-end">
+                <div class="col-lg-6">
+                    <h2 class="section-title text-start mb-1">Nearby Hospital Facilities</h2>
+                    <p class="text-muted">Find the best medical care within your reach instantly.</p>
+                </div>
+                <div class="col-lg-6 text-lg-end">
+                    <button class="btn btn-outline-primary rounded-pill" id="locate-me"><i class="fa-solid fa-crosshairs me-2"></i> Use Current Location</button>
+                    <button class="btn btn-primary rounded-pill ms-2" data-bs-toggle="collapse" data-bs-target="#filterBox">
+                        <i class="fa-solid fa-sliders me-2"></i> Filter
+                    </button>
+                </div>
+            </div>
+
+            <div class="collapse mb-4" id="filterBox">
+                <div class="card card-body border-0 shadow-sm rounded-4 bg-light">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control rounded-pill border-0 px-4" id="search-bar" placeholder="Search by name...">
+                        </div>
+                        <div class="col-md-6">
+                            <select class="form-select rounded-pill border-0 px-4" id="type-filter">
+                                <option value="All">All Facility Types</option>
+                                <option value="Government">Government Hospitals</option>
+                                <option value="Private">Private Medical Centers</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 finder-container">
+                <div class="col-lg-5 order-2 order-lg-1">
+                    <div class="hospital-list-wrapper rounded-4 bg-white p-3 shadow-sm border overflow-auto" id="hospital-list">
+                        <!-- List loaded by JS -->
+                    </div>
+                </div>
+                <div class="col-lg-7 order-1 order-lg-2">
+                    <div class="map-wrapper rounded-4 shadow-lg border overflow-hidden position-relative">
+                        <div id="map"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools & AI Section -->
+    <section id="tools" class="health-tools py-5 bg-medical-light">
+        <div class="container">
+             <div class="row g-5">
+                 <!-- Emotion Detection -->
+                 <div class="col-lg-6">
+                     <div class="card border-0 shadow rounded-4 overflow-hidden h-100">
+                         <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                             <h5 class="fw-bold mb-0 text-blue"><i class="fa-solid fa-camera me-2"></i> Emotion Detective</h5>
+                             <span class="badge bg-soft-blue text-blue rounded-pill">AI Powered</span>
+                         </div>
+                         <div class="card-body p-4 text-center">
+                             <div class="video-container rounded-4 mb-3 position-relative bg-dark" id="webcam-box">
+                                 <video id="video" width="100%" height="auto" autoplay muted class="rounded-4"></video>
+                                 <div class="detection-overlay d-flex flex-column align-items-center justify-content-center" id="detection-msg">
+                                     <i class="fa-solid fa-video-slash fs-1 text-white opacity-50 mb-3"></i>
+                                     <p class="text-white small">Start detection to analyze emotion</p>
+                                     <button class="btn btn-primary rounded-pill px-4" id="start-camera">Grant Webcam Access</button>
+                                 </div>
+                             </div>
+                             <div class="emotion-result py-3 px-4 bg-white rounded-pill d-inline-flex gap-2 align-items-center shadow-sm" id="emotion-label">
+                                 <i class="fa-solid fa-face-grin-beam fs-4"></i>
+                                 <span class="fw-bold">Waiting for input...</span>
+                             </div>
+                             <p class="text-muted mt-3 small" id="emotion-advice">We use your webcam feed for real-time analysis. No video data is ever stored.</p>
+                         </div>
+                     </div>
+                 </div>
+
+                 <!-- Symptom Chatbot -->
+                 <div class="col-lg-6">
+                    <div class="card border-0 shadow rounded-4 overflow-hidden h-100 chatbot-card">
+                        <div class="card-header bg-white border-0 py-3">
+                            <h5 class="fw-bold mb-0 text-green"><i class="fa-solid fa-comment-medical me-2"></i> MedLink Symptom Assistant</h5>
+                        </div>
+                        <div class="card-body p-0 chat-container bg-light d-flex flex-column">
+                            <div class="chat-messages p-3 flex-grow-1 overflow-auto" id="chat-box">
+                                <div class="chat-msg bot-msg shadow-sm p-3 rounded-4 mb-3">
+                                    <p class="mb-0 small fw-bold text-dark">Hello! I'm your MedLink assistant. Are you feeling well today? Describe your symptoms (e.g., "I have a fever" or "My head hurts").</p>
+                                    <small class="text-muted d-block mt-1">Just now</small>
+                                </div>
+                            </div>
+                            <div class="chat-input p-3 bg-white border-top">
+                                <div class="input-group">
+                                    <input type="text" class="form-control rounded-pill-start border-0 bg-light px-3" id="user-input" placeholder="Type symptoms here...">
+                                    <button class="btn btn-success rounded-pill-end px-4" id="send-chat"><i class="fa-solid fa-paper-plane"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+    </section>
+
+    <!-- First Aid Section -->
+    <section id="first-aid" class="first-aid py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Essential First Aid Guide</h2>
+                <p class="text-muted">Stay calm and follow these simple steps during an emergency.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-xl-3">
+                    <div class="first-aid-card p-4 rounded-4 shadow-sm border-0 transition" data-bs-toggle="modal" data-bs-target="#burnModal">
+                        <div class="first-aid-icon bg-soft-orange text-warning mb-3">
+                            <i class="fa-solid fa-fire"></i>
+                        </div>
+                        <h5 class="fw-bold">Accidental Burns</h5>
+                        <p class="text-muted small">Cool the burn under cold running water immediately...</p>
+                        <button class="btn btn-link text-blue p-0 fw-bold small">Read Steps <i class="fa-solid fa-arrow-right ms-1"></i></button>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="first-aid-card p-4 rounded-4 shadow-sm border-0 transition" data-bs-toggle="modal" data-bs-target="#cutModal">
+                        <div class="first-aid-icon bg-soft-red text-danger mb-3">
+                            <i class="fa-solid fa-bandage"></i>
+                        </div>
+                        <h5 class="fw-bold">Cuts & Bleeding</h5>
+                        <p class="text-muted small">Apply firm pressure with a clean cloth to stop bleeding...</p>
+                        <button class="btn btn-link text-blue p-0 fw-bold small">Read Steps <i class="fa-solid fa-arrow-right ms-1"></i></button>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="first-aid-card p-4 rounded-4 shadow-sm border-0 transition" data-bs-toggle="modal" data-bs-target="#cprModal">
+                        <div class="first-aid-icon bg-soft-blue text-blue mb-3">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </div>
+                        <h5 class="fw-bold">CPR (Rescue Breathing)</h5>
+                        <p class="text-muted small">Begin chest compressions at a rate of 100-120 per minute...</p>
+                        <button class="btn btn-link text-blue p-0 fw-bold small">Read Steps <i class="fa-solid fa-arrow-right ms-1"></i></button>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="first-aid-card p-4 rounded-4 shadow-sm border-0 transition" data-bs-toggle="modal" data-bs-target="#feverModal">
+                        <div class="first-aid-icon bg-soft-green text-green mb-3">
+                            <i class="fa-solid fa-thermometer"></i>
+                        </div>
+                        <h5 class="fw-bold">High Fever Tips</h5>
+                        <p class="text-muted small">Stay hydrated and use cool compresses if necessary...</p>
+                        <button class="btn btn-link text-blue p-0 fw-bold small">Read Steps <i class="fa-solid fa-arrow-right ms-1"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section py-5 bg-medical-light">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80" alt="About MedLink" class="img-fluid rounded-4 shadow">
+                </div>
+                <div class="col-lg-6">
+                    <h2 class="section-title text-start mb-4">The Purpose of MedLink</h2>
+                    <p class="text-muted mb-4 fs-5">MedLink was built with a simple mission: to bridge the critical gap between patients and emergency medical care. Our platform uses modern technology to locate resources, spread health awareness, and provide immediate life-saving support when every second counts.</p>
+                    <ul class="list-unstyled mb-5">
+                        <li class="mb-3 d-flex align-items-center"><i class="fa-solid fa-circle-check text-green me-3 fs-3"></i> <strong>Instant Hospital Discovery</strong> - No more searching during crises.</li>
+                        <li class="mb-3 d-flex align-items-center"><i class="fa-solid fa-circle-check text-green me-3 fs-3"></i> <strong>24/7 Virtual Assistant</strong> - Symptom guidance at your fingertips.</li>
+                        <li class="d-flex align-items-center"><i class="fa-solid fa-circle-check text-green me-3 fs-3"></i> <strong>Real-time Bed Availability</strong> - Smarter decisions for critical care.</li>
+                    </ul>
+                    <a href="#home" class="btn btn-medical-indigo rounded-pill px-5 py-3 fw-bold">Learn More About Our Vision</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-medical-dark text-white pt-5 pb-3">
+        <div class="container text-center text-md-start">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h4 class="fw-bold text-blue mb-4">MedLink</h4>
+                    <p class="text-white-50">Building a safer, healthier world through accessible emergency information and intelligent healthcare tools.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="fw-bold mb-4">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#home" class="text-white-50 text-decoration-none mb-2 d-block">Home</a></li>
+                        <li><a href="#finder" class="text-white-50 text-decoration-none mb-2 d-block">Hospital Finder</a></li>
+                        <li><a href="#first-aid" class="text-white-50 text-decoration-none mb-2 d-block">First Aid Guide</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="fw-bold mb-4">Contact Us</h5>
+                    <p class="text-white-50 mb-1"><i class="fa-solid fa-location-dot me-2"></i> 123 Healthcare Way, Medical City</p>
+                    <p class="text-white-50 mb-1"><i class="fa-solid fa-phone me-2"></i> +91 1800-MED-LINK</p>
+                    <p class="text-white-50"><i class="fa-solid fa-envelope me-2"></i> support@medlink.com</p>
+                </div>
+            </div>
+            <hr class="my-4 border-secondary opacity-25">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                <p class="small text-white-50 mb-0">&copy; 2026 MedLink Healthcare. All rights reserved.</p>
+                <div class="social-links d-flex gap-3">
+                    <a href="#" class="text-white-50 fs-5"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" class="text-white-50 fs-5"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" class="text-white-50 fs-5"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODALS -->
+
+    <!-- Emergency Modal -->
+    <div class="modal fade" id="emergencyModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 overflow-hidden">
+                <div class="modal-header bg-danger text-white border-0 py-3">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i> CRITICAL EMERGENCY</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <p class="fw-bold mb-4">Please call these numbers immediately for help:</p>
+                    <div class="d-grid gap-3 mb-4">
+                        <a href="tel:108" class="btn btn-outline-danger btn-lg py-3 rounded-4 d-flex align-items-center justify-content-between">
+                            <div class="text-start"><h6 class="mb-0 fw-bold">Ambulance Service</h6><small>GVK EMRI</small></div>
+                            <span class="fs-2 fw-bold">108</span>
+                        </a>
+                        <a href="tel:112" class="btn btn-outline-dark btn-lg py-3 rounded-4 d-flex align-items-center justify-content-between">
+                            <div class="text-start"><h6 class="mb-0 fw-bold">Police Emergency</h6><small>National Helpline</small></div>
+                            <span class="fs-2 fw-bold">112</span>
+                        </a>
+                        <a href="tel:101" class="btn btn-outline-warning btn-lg py-3 rounded-4 d-flex align-items-center justify-content-between text-dark">
+                            <div class="text-start"><h6 class="mb-0 fw-bold">Fire Brigade</h6><small>Emergency Response</small></div>
+                            <span class="fs-2 fw-bold">101</span>
+                        </a>
+                    </div>
+                    <div class="alert alert-secondary border-0 mb-0 small">
+                        <i class="fa-solid fa-circle-info me-2 text-primary"></i> <b>Stay calm.</b> Clearly tell the operator your location and the nature of the emergency.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modals (Login/Signup) placeholder -->
+    <!-- (Detailed logic for auth will be handled via JS and these modals) -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-body p-5">
+                    <h3 class="fw-bold mb-4 text-center">Welcome Back</h3>
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Email Address</label>
+                            <input type="email" class="form-control rounded-pill px-4 py-2" id="login-email" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small">Password</label>
+                            <input type="password" class="form-control rounded-pill px-4 py-2" id="login-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Login to Account</button>
+                    </form>
+                    <p class="text-center mt-4 small mb-0">Don't have an account? <a href="#" class="text-blue fw-bold" data-bs-toggle="modal" data-bs-target="#signupModal">Sign Up</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="signupModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-body p-5">
+                    <h3 class="fw-bold mb-3 text-center">Create Account</h3>
+                    <p class="text-center text-muted small mb-4">Join our community for a safer healthcare experience.</p>
+                    <form id="signup-form">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Full Name</label>
+                            <input type="text" class="form-control rounded-pill px-4 py-2" id="signup-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Email Address</label>
+                            <input type="email" class="form-control rounded-pill px-4 py-2" id="signup-email" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small">Password</label>
+                            <input type="password" class="form-control rounded-pill px-4 py-2" id="signup-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Create Account</button>
+                    </form>
+                    <p class="text-center mt-4 small mb-0">Already have an account? <a href="#" class="text-blue fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- First Aid Modal Template (Example: Burn) -->
+    <div class="modal fade" id="burnModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header bg-warning py-3">
+                    <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-fire me-2"></i> Accidental Burn Treatment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <img src="https://images.unsplash.com/photo-1542884748-2b87b36c6b90?auto=format&fit=crop&w=400&q=80" class="img-fluid rounded-4 shadow-sm" alt="Burn treatment">
+                        </div>
+                        <div class="col-md-8">
+                            <h6 class="fw-bold mb-3">Immediate Step-by-Step Instructions:</h6>
+                            <ol class="ps-3 text-muted">
+                                <li class="mb-2"><b>Cool the burn:</b> Hold the burned area under cool (not cold) running water for at least 10–20 minutes.</li>
+                                <li class="mb-2"><b>Remove jewelry/belts:</b> Do this gently before the area begins to swell.</li>
+                                <li class="mb-2"><b>Do not pop blisters:</b> Fluid-filled blisters protect against infection. If one pops, clean it with mild soap/water.</li>
+                                <li class="mb-2"><b>Apply moisturizer/aloe:</b> Once the burn is cooled, apply a soothing lotion to prevent drying.</li>
+                                <li class="mb-2"><b>Bandage loosely:</b> Use a sterile gauze bandage. Avoid fluffy cotton that can stick.</li>
+                            </ol>
+                            <div class="alert alert-danger border-0 small py-2">
+                                <i class="fa-solid fa-triangle-exclamation me-2"></i> <b>WARNING:</b> Seek immediate ER care for large burns, face burns, or electrical burns.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cut Modal -->
+    <div class="modal fade" id="cutModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header bg-danger text-white py-3">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-bandage me-2"></i> Cuts & Bleeding Treatment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <img src="https://images.unsplash.com/photo-1579684385127-1df157c98de3?auto=format&fit=crop&w=400&q=80" class="img-fluid rounded-4 shadow-sm" alt="Cut treatment">
+                        </div>
+                        <div class="col-md-8">
+                            <h6 class="fw-bold mb-3">Simple Steps to Stop Bleeding:</h6>
+                            <ol class="ps-3 text-muted">
+                                <li class="mb-2"><b>Wash your hands:</b> Avoid infecting the wound by using soap or gloves.</li>
+                                <li class="mb-2"><b>Apply pressure:</b> Use a clean cloth or bandage and press firmly for several minutes.</li>
+                                <li class="mb-2"><b>Clean the wound:</b> Rinse with clear water once bleeding stops. Clean the area around it with soap.</li>
+                                <li class="mb-2"><b>Apply antibiotic/ointment:</b> Thin layer of Neosporin or similar to keep the surface moist.</li>
+                                <li class="mb-2"><b>Cover it:</b> Use a bandage or gauze to keep the wound clean and bacteria-free.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fever Modal -->
+    <div class="modal fade" id="feverModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header bg-success text-white py-3">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-thermometer me-2"></i> High Fever Precautions</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=400&q=80" class="img-fluid rounded-4 shadow-sm" alt="Fever treatment">
+                        </div>
+                        <div class="col-md-8">
+                            <h6 class="fw-bold mb-3">How to Manage Fever:</h6>
+                            <ol class="ps-3 text-muted">
+                                <li class="mb-2"><b>Drink plenty of fluids:</b> Fever can cause dehydration. Drink water, juice, or broth.</li>
+                                <li class="mb-2"><b>Rest:</b> Your body needs energy to recover and fight infection.</li>
+                                <li class="mb-2"><b>Stay cool:</b> Dress in lightweight clothing and keep the room temperature comfortable.</li>
+                                <li class="mb-2"><b>Cold compress:</b> Apply a damp cloth to the forehead if the person feels unwell.</li>
+                                <li class="mb-2"><b>OTC Medication:</b> Use acetaminophen or ibuprofen as directed by a pharmacist.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CPR Modal -->
+    <div class="modal fade" id="cprModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header bg-primary text-white py-3">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-heart-pulse me-2"></i> CPR (Cardiopulmonary Resuscitation)</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=400&q=80" class="img-fluid rounded-4 shadow-sm" alt="CPR">
+                        </div>
+                        <div class="col-md-8">
+                            <h6 class="fw-bold mb-3">Hands-Only CPR Steps:</h6>
+                            <ol class="ps-3 text-muted">
+                                <li class="mb-2"><b>Check the scene:</b> Ensure it's safe for you to help.</li>
+                                <li class="mb-2"><b>Check responsiveness:</b> Tap their shoulder and shout. If no response, call 108 immediately.</li>
+                                <li class="mb-2"><b>Chest compressions:</b> Place hands in the center of the chest. Push hard and fast (100-120 bpm).</li>
+                                <li class="mb-2"><b>Rescue breaths:</b> If trained, give 2 breaths after every 30 compressions.</li>
+                                <li class="mb-2"><b>Continue:</b> Do not stop until paramedics arrive or an AED is available.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    
+    <!-- Face API for Emotion Detection -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
