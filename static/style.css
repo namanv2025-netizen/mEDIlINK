@@ -1,0 +1,270 @@
+/* 
+   MEDLINK PREMIUM STYLING
+   Theme: Clean Medical [Blue, White, Light Green]
+*/
+
+:root {
+    --primary-blue: #0ea5e9;
+    --primary-blue-soft: #e0f2fe;
+    --primary-green: #22c55e;
+    --primary-green-soft: #f0fdf4;
+    --medical-dark: #0f172a;
+    --medical-light: #f8fafc;
+    --emergency-red: #ef4444;
+    --white: #ffffff;
+    --transition-fast: all 0.2s ease;
+    --transition-mid: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --radius-pill: 50px;
+    --radius-card: 24px;
+}
+
+* {
+    font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, .navbar-brand {
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background-color: var(--white);
+    color: var(--medical-dark);
+}
+
+/* Utilities */
+.text-blue { color: var(--primary-blue); }
+.text-green { color: var(--primary-green); }
+.bg-medical-light { background-color: var(--medical-light); }
+.bg-medical-dark { background-color: var(--medical-dark); }
+.bg-soft-blue { background-color: var(--primary-blue-soft); }
+.bg-soft-green { background-color: var(--primary-green-soft); }
+.bg-soft-red { background-color: #fee2e2; }
+.bg-soft-yellow { background-color: #fef9c3; }
+.bg-soft-orange { background-color: #ffedd5; }
+.bg-light-green { background-color: #dcfce7; }
+.bg-blue-grad { background: linear-gradient(135deg, var(--primary-blue), #0284c7); }
+
+.transition { transition: var(--transition-mid); }
+.transition:hover { transform: translateY(-5px); }
+
+/* Navigation */
+.navbar {
+    transition: var(--transition-mid);
+    padding: 0.8rem 0;
+}
+.logo-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.5rem;
+}
+.nav-link {
+    color: var(--medical-dark) !important;
+    position: relative;
+    transition: var(--transition-fast);
+}
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--primary-blue);
+    transition: var(--transition-fast);
+    transform: translateX(-50%);
+}
+.nav-link:hover::after, .nav-link.active::after {
+    width: 20px;
+}
+.nav-link:hover {
+    color: var(--primary-blue) !important;
+}
+
+/* Hero Section */
+.hero-section {
+    min-height: 85vh;
+    background: radial-gradient(circle at top right, var(--primary-blue-soft), transparent 40%),
+                radial-gradient(circle at bottom left, var(--primary-green-soft), transparent 40%);
+}
+.hero-img-wrapper {
+    position: relative;
+}
+.hero-img {
+    border: 8px solid white;
+}
+.floating-card {
+    position: absolute;
+    bottom: -20px;
+    right: 20px;
+    width: 140px;
+}
+
+/* Emergency FAB */
+.emergency-fab {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 2000;
+    background: var(--emergency-red);
+    color: white;
+    padding: 12px 24px;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 800;
+    animation: bouncePulse 2s infinite;
+    transition: var(--transition-fast);
+}
+.emergency-fab:hover {
+    transform: scale(1.05);
+    background: #dc2626;
+}
+@keyframes bouncePulse {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Section Styling */
+.section-title {
+    font-weight: 800;
+    font-size: 2.2rem;
+}
+.section-underline {
+    width: 60px;
+    height: 4px;
+    background: var(--primary-blue);
+    border-radius: 2px;
+}
+
+/* Service Cards */
+.service-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+}
+
+/* Hospital Finder */
+.finder-container {
+    height: 650px;
+}
+.hospital-list-wrapper {
+    height: 100%;
+}
+.hospital-card {
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+.hospital-card:hover {
+    border-color: var(--primary-blue);
+    background: var(--medical-light);
+}
+.hospital-card.active {
+    background: var(--primary-blue-soft);
+    border-color: var(--primary-blue);
+}
+.availability-badge {
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.map-wrapper {
+    height: 100%;
+    min-height: 400px;
+}
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+/* AI Tools */
+.video-container {
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+}
+.detection-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    transition: var(--transition-mid);
+}
+.detection-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Chatbot */
+.chatbot-card {
+    height: 600px;
+}
+.chat-messages {
+    background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+}
+.chat-msg {
+    max-width: 85%;
+    font-size: 0.9rem;
+}
+.bot-msg {
+    background: white;
+    border-bottom-left-radius: 2px;
+}
+.user-msg {
+    background: var(--primary-blue);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 2px;
+}
+
+/* First Aid */
+.first-aid-card {
+    cursor: pointer;
+    background: white;
+}
+.first-aid-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+/* Forms */
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 4px var(--primary-blue-soft);
+    border-color: var(--primary-blue);
+}
+
+/* Responsive Fixes */
+@media (max-width: 991px) {
+    .hero-section { text-align: center; }
+    .finder-container { height: auto; }
+    .hospital-list-wrapper { height: 500px; }
+}
